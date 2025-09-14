@@ -1,0 +1,70 @@
+body {
+  margin: 0;
+  background: #e0f7fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+.container { position: relative; }
+.bubble {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 3px solid #333;
+  border-radius: 15px;
+  padding: 15px;
+  font-size: 18px;
+  width: 250px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+.computer {
+  width: 220px;
+  height: 160px;
+  background: #333;
+  border: 5px solid #000;
+  border-radius: 10px;
+  position: relative;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+  margin-top: 60px;
+}
+.screen {
+  background: #4caf50;
+  width: 90%;
+  height: 70%;
+  margin: 10px auto;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  text-align: center;
+  padding: 5px;
+}
+.eye { width: 50px; height: 50px; background: white; border-radius: 50%; position: absolute; top: -60px; overflow: hidden; border: 3px solid #000; }
+.eye.left { left: 40px; }
+.eye.right { right: 40px; }
+.pupil { width: 20px; height: 20px; background: black; border-radius: 50%; position: absolute; top: 15px; left: 15px; transition: all 0.1s; }
+.mouth { width: 60px; height: 15px; background: red; border-radius: 0 0 50% 50%; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); }
+.arm { width: 20px; height: 80px; background: #555; position: absolute; top: 40px; }
+.arm.left { left: -20px; transform-origin: top right; }
+.arm.right { right: -20px; transform-origin: top left; }
+.hand { width: 40px; height: 40px; position: absolute; bottom: 0; left: -10px; }
+.finger { width: 8px; height: 25px; background: #ffcc99; border-radius: 5px; position: absolute; bottom: 0; animation: wiggle 1s infinite ease-in-out; }
+.finger:nth-child(1) { left: 0; animation-delay: 0s; }
+.finger:nth-child(2) { left: 10px; animation-delay: 0.1s; }
+.finger:nth-child(3) { left: 20px; animation-delay: 0.2s; }
+.finger:nth-child(4) { left: 30px; animation-delay: 0.3s; }
+@keyframes wiggle { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
+.leg { width: 20px; height: 60px; background: #666; position: absolute; bottom: -60px; }
+.leg.left { left: 60px; }
+.leg.right { right: 60px; }
