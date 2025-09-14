@@ -1,32 +1,425 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funny Educational Computer</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Riddle Drag & Tap — Kids Game</title>
+  <style>
+    :root{
+      --bg1:#ff9a9e; --bg2:#fad0c4; --accent1:#43e97b; --accent2:#38f9d7; --card:#fff; --muted:#f0f0f0;
+      --shadow:0 8px 24px rgba(0,0,0,0.15);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{font-family: 'Comic Sans MS', cursive, sans-serif; background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh; margin:0; display:flex; align-items:center; justify-content:center; padding:28px;}
+    .app{width:100%; max-width:980px; background:transparent;}
+
+    .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+    .logo{font-size:1.4rem; color:#fff; font-weight:700; text-shadow:1px 1px 4px rgba(0,0,0,0.4)}
+    .musicBtn{background:transparent; border:none; font-size:28px; cursor:pointer; color:#fff; padding:6px 10px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border-radius:20px; padding:20px; box-shadow:var(--shadow);}
+
+    #startScreen{display:flex; gap:18px; align-items:center; justify-content:center; flex-direction:column; padding:28px}
+    #playerName{font-size:18px; padding:12px 16px; border-radius:24px; border:none; width:260px}
+    .startBtn{background:linear-gradient(45deg,var(--accent1),var(--accent2)); color:#fff; padding:12px 20px; border-radius:24px; font-size:18px; border:none; cursor:pointer}
+
+    #categoryScreen{display:none; padding:12px}
+    .categoryGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+    .catCard{background:var(--card); padding:12px; border-radius:14px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    .catCard h3{margin:8px 0 4px}
+    .catCard p{margin:0; font-size:13px; color:#666}
+
+    #gameArea{display:none}
+    .riddleBar{display:flex; align-items:center; justify-content:space-between}
+    #riddle{font-size:20px; padding:18px; border-radius:14px; background:linear-gradient(90deg,#fff3b0,#fff7e1); flex:1; margin-right:12px}
+    .meta{min-width:160px; text-align:right}
+    .progress{height:14px; background:#eee; border-radius:99px; overflow:hidden; margin-top:8px}
+    .progress > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,#ff6a00,#ee0979); transition:width .6s ease}
+    #progressLabel{font-size:12px;color:#333;margin-top:4px}
+
+    #answerSlots{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:18px 0}
+    .slot{min-width:46px; height:46px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; background:#f0f8ff; font-weight:700; font-size:18px; border-bottom:3px solid #000;}
+    .gap{width:20px}
+
+    #letters{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+    .tile{padding:12px 14px; border-radius:12px; cursor:pointer; user-select:none; font-weight:800; font-size:18px; box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    .tile[role=button]{outline:none}
+
+    #controls{display:flex; gap:8px; justify-content:center; margin-top:12px}
+    #controls button{padding:10px 14px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(45deg,var(--accent1),var(--accent2)); color:#fff}
+
+    #feedback{font-size:20px; text-align:center; margin-top:10px; min-height:28px}
+
+    #report{display:none; padding:14px}
+    #report table{width:100%; border-collapse:collapse}
+    #report th, #report td{padding:8px; border:1px solid #ddd}
+    .medal{font-size:36px}
+
+    #leaderboard{display:none; margin-top:12px}
+    #lbTable{width:100%; border-collapse:collapse}
+    #lbTable th,#lbTable td{padding:8px;border:1px solid #ddd;text-align:left}
+  </style>
 </head>
 <body>
-<div class="container">
-  <div class="bubble" id="bubble">👋 Do you want to know what I can do?</div>
-  <div class="computer" id="computer">
-    <div class="screen" id="screen">💻 Hello!</div>
-    <div class="eye left"><div class="pupil"></div></div>
-    <div class="eye right"><div class="pupil"></div></div>
-    <div class="mouth" id="mouth"></div>
-    <div class="arm left">
-      <div class="hand">
-        <div class="finger"></div>
-        <div class="finger"></div>
-        <div class="finger"></div>
-        <div class="finger"></div>
+  <div class="app">
+    <div class="topbar">
+      <div class="logo">Riddle Drag & Tap</div>
+      <button id="musicBtn" class="musicBtn" title="Toggle music">🎵</button>
+    </div>
+
+    <div class="card">
+      <!-- Start Screen -->
+      <div id="startScreen">
+        <h1 style="margin:0;color:#333">Welcome!</h1>
+        <div style="font-size:15px;color:#555">Enter your name to begin</div>
+        <input id="playerName" placeholder="Your name" />
+        <div style="display:flex; gap:12px; align-items:center">
+          <button id="startBtn" class="startBtn">Start</button>
+        </div>
+      </div>
+
+      <!-- Category Selection -->
+      <div id="categoryScreen">
+        <h2 style="margin-top:0">Choose a category</h2>
+        <div class="categoryGrid" id="categoryGrid"></div>
+        <div style="text-align:center;margin-top:12px"><button id="catBack" class="startBtn" style="background:linear-gradient(45deg,#f7971e,#ffd200)">Back</button></div>
+      </div>
+
+      <!-- Game Area -->
+      <div id="gameArea">
+        <div class="riddleBar">
+          <div id="riddle">Riddle will appear here</div>
+          <div class="meta">
+            <div id="qCount">Q 0 / 10</div>
+            <div class="progress" style="width:160px"><i id="progressFill"></i></div>
+            <div id="progressLabel"></div>
+            <div style="font-size:12px;color:#444;margin-top:8px" id="playerLabel"></div>
+          </div>
+        </div>
+
+        <div id="answerSlots"></div>
+        <div id="letters"></div>
+        <div id="controls"></div>
+        <div id="feedback"></div>
+      </div>
+
+      <!-- Report -->
+      <div id="report">
+        <h2 id="reportTitle"></h2>
+        <div id="scoreSummary" style="display:flex;gap:12px;align-items:center"></div>
+        <div id="reportBody"></div>
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:center">
+          <button id="playAgainBtn" class="startBtn">Play Again</button>
+          <button id="showLB" class="startBtn" style="background:linear-gradient(45deg,#6a11cb,#2575fc)">Leaderboard</button>
+        </div>
+
+        <div id="leaderboard">
+          <h3>Leaderboard</h3>
+          <table id="lbTable"><thead><tr><th>Rank</th><th>Name</th><th>Score %</th><th>Medal</th></tr></thead><tbody id="lbBody"></tbody></table>
+          <div style="text-align:center;margin-top:10px"><button id="closeLB" class="startBtn" style="background:linear-gradient(45deg,#f7971e,#ffd200)">Close</button></div>
+        </div>
       </div>
     </div>
-    <div class="arm right"></div>
-    <div class="leg left"></div>
-    <div class="leg right"></div>
   </div>
-</div>
-<script src="script.js"></script>
+
+  <!-- audio -->
+  <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+  <audio id="correctSound" src="https://www.soundjay.com/misc/sounds/kbc-win-01.mp3"></audio>
+  <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
+
+  <script>
+  const riddles={
+computer:[
+{q:"I have keys but no doors",a:"KEYBOARD",emoji:"⌨️"},
+{q:"I have a brain but I am not human",a:"CPU",emoji:"🖥️"},
+{q:"I show pictures and text",a:"MONITOR",emoji:"🖥️"},
+{q:"I move the cursor",a:"MOUSE",emoji:"🖱️"},
+{q:"I keep files when power is off",a:"HARD DISK",emoji:"💾"},
+{q:"I print documents",a:"PRINTER",emoji:"🖨️"},
+{q:"I help you browse the internet",a:"BROWSER",emoji:"🌐"},
+{q:"I store programs temporarily",a:"RAM",emoji:"💾"},
+{q:"I process data",a:"PROCESSOR",emoji:"🖥️"},
+{q:"I am used to click links",a:"TOUCHPAD",emoji:"🖱️"},
+{q:"I run apps on mobile",a:"OPERATING SYSTEM",emoji:"📱"},
+{q:"I protect computer from viruses",a:"ANTIVIRUS",emoji:"🛡️"},
+{q:"I connect computers in network",a:"ROUTER",emoji:"📡"},
+{q:"I display text in command mode",a:"TERMINAL",emoji:"💻"},
+{q:"I am storage that is fast",a:"SSD",emoji:"💾"},
+{q:"I am the main circuit board",a:"MOTHERBOARD",emoji:"🖥️"},
+{q:"I send emails electronically",a:"EMAIL",emoji:"📧"},
+{q:"I take photos digitally",a:"CAMERA",emoji:"📷"},
+{q:"I hold memory",a:"USB",emoji:"💾"},
+{q:"I cool the computer",a:"FAN",emoji:"🌀"},
+{q:"I help design graphics",a:"PHOTOSHOP",emoji:"🎨"},
+{q:"I write code",a:"PROGRAMMING",emoji:"💻"},
+{q:"I run calculations",a:"CALCULATOR",emoji:"🧮"},
+{q:"I connect devices",a:"BLUETOOTH",emoji:"🔵"},
+{q:"I display moving pictures",a:"PROJECTOR",emoji:"📽️"},
+{q:"I type text with fingers",a:"KEYPAD",emoji:"⌨️"},
+{q:"I connect to WiFi",a:"MODEM",emoji:"📡"},
+{q:"I watch videos online",a:"YOUTUBE",emoji:"📺"},
+{q:"I store music",a:"MP3PLAYER",emoji:"🎵"},
+{q:"I write documents",a:"WORD",emoji:"📄"},
+{q:"I manage tables",a:"EXCEL",emoji:"📊"},
+{q:"I make presentations",a:"POWERPOINT",emoji:"📊"},
+{q:"I manage database",a:"ACCESS",emoji:"💽"},
+{q:"I type fast",a:"TYPING",emoji:"⌨️"},
+{q:"I send messages",a:"WHATSAPP",emoji:"💬"},
+{q:"I edit images",a:"PAINT",emoji:"🖌️"},
+{q:"I search online",a:"GOOGLE",emoji:"🔍"},
+{q:"I store files online",a:"CLOUD",emoji:"☁️"},
+{q:"I create websites",a:"HTML",emoji:"🌐"},
+{q:"I style websites",a:"CSS",emoji:"🎨"},
+{q:"I add interactivity",a:"JAVASCRIPT",emoji:"💻"},
+{q:"I convert files",a:"PDF",emoji:"📄"},
+{q:"I run presentations",a:"SLIDES",emoji:"📊"},
+{q:"I manage emails",a:"OUTLOOK",emoji:"📧"},
+{q:"I edit videos",a:"PREMIERE",emoji:"🎬"},
+{q:"I code apps",a:"ANDROID",emoji:"🤖"},
+{q:"I make AI models",a:"CHATGPT",emoji:"🤖"},
+{q:"I store graphics",a:"PHOTOS",emoji:"🖼️"},
+{q:"I type on phone",a:"KEYBOARD",emoji:"⌨️"},
+{q:"I scan barcodes",a:"SCANNER",emoji:"📠"},
+{q:"I measure temperature",a:"THERMOMETER",emoji:"🌡️"},
+{q:"I control lights remotely",a:"SMARTHOME",emoji:"🏠"}
+],
+animals:[
+{q:"I have a mane and roar loudly",a:"LION",emoji:"🦁"},
+{q:"I give milk and say moo",a:"COW",emoji:"🐄"},
+{q:"I hop and have long ears",a:"RABBIT",emoji:"🐇"},
+{q:"I carry my house on my back",a:"TURTLE",emoji:"🐢"},
+{q:"I slither and hiss",a:"SNAKE",emoji:"🐍"},
+{q:"I am king of the jungle",a:"TIGER",emoji:"🐯"},
+{q:"I quack and swim",a:"DUCK",emoji:"🦆"},
+{q:"I have black and white stripes",a:"ZEBRA",emoji:"🦓"},
+{q:"I have a long trunk",a:"ELEPHANT",emoji:"🐘"},
+{q:"I fly at night and use echolocation",a:"BAT",emoji:"🦇"},
+{q:"I live in water and have fins",a:"FISH",emoji:"🐟"},
+{q:"I am slow and carry shell",a:"SNAIL",emoji:"🐌"},
+{q:"I have big tusks",a:"MAMMOTH",emoji:"🐘"},
+{q:"I have a pouch for babies",a:"KANGAROO",emoji:"🦘"},
+{q:"I change colors to hide",a:"CHAMELEON",emoji:"🦎"},
+{q:"I have feathers and can swim",a:"PENGUIN",emoji:"🐧"},
+{q:"I roar under water",a:"HIPPOPOTAMUS",emoji:"🦛"},
+{q:"I have a shell and swim",a:"SEA TURTLE",emoji:"🐢"},
+{q:"I have a hump and spit",a:"CAMEL",emoji:"🐫"},
+{q:"I have a long neck and spots",a:"GIRAFFE",emoji:"🦒"},
+{q:"I live in hives and make honey",a:"BEE",emoji:"🐝"},
+{q:"I sting and make honey",a:"WASP",emoji:"🐝"},
+{q:"I have stripes and sting",a:"BEE",emoji:"🐝"},
+{q:"I howl at night",a:"WOLF",emoji:"🐺"},
+{q:"I have a bushy tail",a:"FOX",emoji:"🦊"},
+{q:"I am slow and eat leaves",a:"SLOTH",emoji:"🦥"},
+{q:"I am big and gray",a:"RHINOCEROS",emoji:"🦏"},
+{q:"I have sharp quills",a:"PORCUPINE",emoji:"🦔"},
+{q:"I live underground",a:"MOLE",emoji:"🐾"},
+{q:"I make webs",a:"SPIDER",emoji:"🕷️"},
+{q:"I am black and live near humans",a:"CAT",emoji:"🐈"},
+{q:"I bark loudly",a:"DOG",emoji:"🐕"},
+{q:"I hop in ponds",a:"FROG",emoji:"🐸"},
+{q:"I fly and drink nectar",a:"BUTTERFLY",emoji:"🦋"},
+{q:"I swim and have a beak",a:"DUCK",emoji:"🦆"},
+{q:"I have antlers",a:"DEER",emoji:"🦌"},
+{q:"I eat bamboo",a:"PANDA",emoji:"🐼"},
+{q:"I fly in night sky",a:"OWL",emoji:"🦉"},
+{q:"I have a shell",a:"SNAIL",emoji:"🐌"},
+{q:"I am red and live in forest",a:"FOX",emoji:"🦊"},
+{q:"I jump far",a:"KANGAROO",emoji:"🦘"},
+{q:"I am spiny and eat ants",a:"ANTEATER",emoji:"🐜"},
+{q:"I am green and live in water",a:"FROG",emoji:"🐸"},
+{q:"I spin silk",a:"SPIDER",emoji:"🕷️"},
+{q:"I am colorful and fly",a:"BUTTERFLY",emoji:"🦋"},
+{q:"I am tall and eat leaves",a:"GIRAFFE",emoji:"🦒"},
+{q:"I am strong and carry wood",a:"BEAVER",emoji:"🦫"}
+],
+environment:[
+{q:"I am the biggest source of light",a:"SUN",emoji:"☀️"},
+{q:"I give oxygen to breathe",a:"TREE",emoji:"🌳"},
+{q:"I fall from the sky as drops",a:"RAIN",emoji:"🌧️"},
+{q:"I blow and make kites fly",a:"WIND",emoji:"🌬️"},
+{q:"I cover 70% of the Earth",a:"OCEAN",emoji:"🌊"},
+{q:"I protect earth from sun rays",a:"OZONE",emoji:"🛡️"},
+{q:"I am frozen water",a:"ICE",emoji:"❄️"},
+{q:"I form when clouds become heavy",a:"RAIN",emoji:"🌧️"},
+{q:"I am bright at night",a:"MOON",emoji:"🌕"},
+{q:"I give light during day",a:"SUNLIGHT",emoji:"☀️"},
+{q:"I am small and live in soil",a:"ANT",emoji:"🐜"},
+{q:"I provide wood",a:"TREE",emoji:"🌳"},
+{q:"I am green and grow",a:"PLANT",emoji:"🌱"},
+{q:"I block sunlight",a:"CLOUD",emoji:"☁️"},
+{q:"I fall as frozen rain",a:"SNOW",emoji:"❄️"},
+{q:"I am the wettest",a:"RAINY SEASON",emoji:"🌧️"},
+{q:"I make waves",a:"OCEAN",emoji:"🌊"},
+{q:"I am in sky and white",a:"CLOUD",emoji:"☁️"},
+{q:"I am dry land",a:"DESERT",emoji:"🏜️"},
+{q:"I produce fruits",a:"TREE",emoji:"🌳"},
+{q:"I turn brown in autumn",a:"LEAF",emoji:"🍂"},
+{q:"I grow in water",a:"LOTUS",emoji:"🌸"},
+{q:"I spin and move air",a:"FAN",emoji:"🌬️"},
+{q:"I am dirty water",a:"MUD",emoji:"🟤"},
+{q:"I flow in rivers",a:"WATER",emoji:"💧"},
+{q:"I am tall and green",a:"TREE",emoji:"🌳"},
+{q:"I am full of ice",a:"GLACIER",emoji:"🧊"},
+{q:"I provide energy",a:"SUN",emoji:"☀️"},
+{q:"I grow in fields",a:"CROP",emoji:"🌾"},
+{q:"I am part of earth crust",a:"ROCK",emoji:"🪨"},
+{q:"I give shade",a:"TREE",emoji:"🌳"},
+{q:"I am loud and strong",a:"THUNDER",emoji:"⚡"},
+{q:"I fall on roofs",a:"RAIN",emoji:"🌧️"},
+{q:"I am round and orbit earth",a:"MOON",emoji:"🌕"},
+{q:"I am wet and green",a:"MOSS",emoji:"🍃"},
+{q:"I am bright and hot",a:"SUN",emoji:"☀️"},
+{q:"I provide habitat",a:"FOREST",emoji:"🌲"},
+{q:"I clean air",a:"TREE",emoji:"🌳"},
+{q:"I am source of energy",a:"WIND",emoji:"🌬️"},
+{q:"I am frozen and white",a:"SNOW",emoji:"❄️"},
+{q:"I am essential for life",a:"WATER",emoji:"💧"},
+{q:"I move in ocean",a:"WAVE",emoji:"🌊"},
+{q:"I block pollution",a:"TREE",emoji:"🌳"},
+{q:"I am yellow and round",a:"SUN",emoji:"☀️"},
+{q:"I am in the sky and twinkle",a:"STAR",emoji:"⭐"}
+]
+};
+
+
+    let playerName='Player', musicOn=false, currentCategory='all';
+    let roundQuestions=[], answersLog=[], currentIndex=0;
+    const ROUND_SIZE=10;
+    let usedQuestions=new Set(); // Track asked questions
+    let hintUsed=0; // per question
+
+    const startScreen=document.getElementById('startScreen');
+    const categoryScreen=document.getElementById('categoryScreen');
+    const categoryGrid=document.getElementById('categoryGrid');
+    const gameArea=document.getElementById('gameArea');
+    const riddleEl=document.getElementById('riddle');
+    const answerSlots=document.getElementById('answerSlots');
+    const lettersEl=document.getElementById('letters');
+    const controlsEl=document.getElementById('controls');
+    const feedbackEl=document.getElementById('feedback');
+    const qCountEl=document.getElementById('qCount');
+    const progressFill=document.getElementById('progressFill');
+    const progressLabel=document.getElementById('progressLabel');
+    const playerLabel=document.getElementById('playerLabel');
+    const report=document.getElementById('report');
+    const reportBody=document.getElementById('reportBody');
+    const reportTitle=document.getElementById('reportTitle');
+    const scoreSummary=document.getElementById('scoreSummary');
+    const playAgainBtn=document.getElementById('playAgainBtn');
+    const showLB=document.getElementById('showLB');
+    const leaderboard=document.getElementById('leaderboard');
+    const lbBody=document.getElementById('lbBody');
+    const bgMusic=document.getElementById('bgMusic');
+    const musicBtn=document.getElementById('musicBtn');
+    const correctSound=document.getElementById('correctSound');
+    const wrongSound=document.getElementById('wrongSound');
+
+    document.getElementById('startBtn').addEventListener('click', ()=>{
+      playerName = (document.getElementById('playerName').value || 'Player').trim() || 'Player';
+      showCategories();
+    });
+    document.getElementById('catBack').addEventListener('click', ()=>{ showStart(); });
+    musicBtn.addEventListener('click', toggleMusic);
+    playAgainBtn.addEventListener('click', ()=>{ showCategories(); });
+    showStart();
+
+    function showCategories(){
+      startScreen.style.display='none'; report.style.display='none';
+      categoryScreen.style.display='block'; gameArea.style.display='none';
+      categoryGrid.innerHTML='';
+      const cats = ['all','computer','animals','environment'];
+      cats.forEach(c=>{
+        const card=document.createElement('div'); card.className='catCard';
+        card.innerHTML=`<h3>${capitalize(c)}</h3><p>${c==='all' ? 'Mixed topics' : 'Riddles about '+c}</p>`;
+        card.onclick=()=>{ currentCategory=c; startRound(); };
+        categoryGrid.appendChild(card);
+      });
+    }
+    function showStart(){ categoryScreen.style.display='none'; startScreen.style.display='flex'; }
+    function capitalize(s){ return (s||'').charAt(0).toUpperCase()+s.slice(1); }
+
+    function startRound(){
+      const pool = currentCategory==='all' ? [...riddles.computer,...riddles.animals,...riddles.environment] : riddles[currentCategory] || [];
+      let freshPool = pool.filter(q=>!usedQuestions.has(q.q));
+      if(freshPool.length<ROUND_SIZE){ usedQuestions.clear(); freshPool=pool; }
+      const shuffled = shuffle(freshPool.slice());
+      roundQuestions = shuffled.slice(0, ROUND_SIZE);
+      roundQuestions.forEach(q=>usedQuestions.add(q.q));
+
+      answersLog = []; currentIndex=0;
+      report.style.display='none'; categoryScreen.style.display='none'; gameArea.style.display='block';
+      playerLabel.textContent = playerName;
+      updateProgress(); renderQuestion();
+    }
+
+    function renderQuestion(){
+      clearTimeout(window._nextTimeout); feedbackEl.textContent=''; controlsEl.innerHTML='';
+      answerSlots.innerHTML=''; lettersEl.innerHTML=''; hintUsed=0;
+      const q = roundQuestions[currentIndex];
+      qCountEl.textContent = `Q ${currentIndex+1} / ${ROUND_SIZE}`; riddleEl.textContent = q.emoji + ' ' + q.q;
+      const answer = q.a; const lettersArr = answer.replace(/\s+/g,'').split('');
+      for(let i=0;i<answer.length;i++){
+        if(answer[i]===' '){ const g=document.createElement('div'); g.className='gap'; answerSlots.appendChild(g); }
+        else{ const s=document.createElement('div'); s.className='slot'; s.dataset.pos=i; s.ondrop=drop; s.ondragover=allowDrop; answerSlots.appendChild(s); }
+      }
+      shuffle(lettersArr.slice()).forEach((L, idx)=>{
+        const t=document.createElement('div'); t.className='tile'; t.textContent=L; t.id='tile_'+idx; 
+        t.draggable=true; t.setAttribute('role','button');
+        t.ondragstart=dragStart; t.onclick = ()=>tileClick(t);
+        t.style.background = `hsl(${Math.random()*360},70%,85%)`;
+        lettersEl.appendChild(t);
+      });
+      const resetBtn=document.createElement('button'); resetBtn.textContent='Reset'; resetBtn.onclick=clearAnswer; controlsEl.appendChild(resetBtn);
+      const skipBtn=document.createElement('button'); skipBtn.textContent='Skip'; skipBtn.onclick=()=>handleSkip(); controlsEl.appendChild(skipBtn);
+      const hintBtn=document.createElement('button'); hintBtn.textContent='Hint (2)'; hintBtn.onclick=()=>useHint(hintBtn); controlsEl.appendChild(hintBtn);
+      updateProgress();
+    }
+
+    function useHint(btn){
+      if(hintUsed>=2) return;
+      const q=roundQuestions[currentIndex]; const answer=q.a.replace(/\s+/g,'');
+      const slots=Array.from(document.querySelectorAll('.slot'));
+      const emptySlots=slots.filter((s,i)=>s.textContent==='' && answer[i]);
+      if(emptySlots.length===0) return;
+      const slot=emptySlots[Math.floor(Math.random()*emptySlots.length)];
+      const idx=Array.from(slots).indexOf(slot); slot.textContent=answer[idx];
+      const tile=Array.from(document.querySelectorAll('.tile')).find(t=>t.textContent===answer[idx] && t.style.visibility!=='hidden');
+      if(tile) tile.style.visibility='hidden';
+      hintUsed++; btn.textContent=`Hint (${2-hintUsed})`; if(hintUsed>=2) btn.disabled=true;
+      checkAutoAnswer();
+    }
+
+    function dragStart(ev){ ev.dataTransfer.setData('text/plain', ev.target.id); }
+    function allowDrop(ev){ ev.preventDefault(); }
+    function drop(ev){ ev.preventDefault(); const id = ev.dataTransfer.getData('text'); const tile = document.getElementById(id); if(!tile) return; if(ev.target.classList.contains('slot') && ev.target.textContent===''){ ev.target.textContent = tile.textContent; tile.style.visibility='hidden'; checkAutoAnswer(); } }
+    function tileClick(tile){ const empty = Array.from(document.querySelectorAll('.slot')).find(s=>s.textContent===''); if(empty){ empty.textContent = tile.textContent; tile.style.visibility='hidden'; checkAutoAnswer(); } }
+
+    function clearAnswer(){ document.querySelectorAll('.slot').forEach(s=>s.textContent=''); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='visible'); feedbackEl.textContent=''; }
+
+    function getUserAnswer(){ return Array.from(document.querySelectorAll('.slot')).map(s=>s.textContent || '').join(''); }
+    function checkAutoAnswer(){ const q=roundQuestions[currentIndex]; const clean=q.a.replace(/\s+/g,''); const user=getUserAnswer(); if(user.length===clean.length){ if(user.toUpperCase()===clean.toUpperCase()){ handleCorrect(); } else { showCorrectNow(); } } }
+
+    function handleCorrect(){ answersLog.push({q:roundQuestions[currentIndex].q, a:roundQuestions[currentIndex].a, correct:true, skipped:false}); feedbackEl.textContent='✅ Correct!'; correctSound.play(); showConfetti(); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 900); }
+
+    function showCorrectNow(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot')); slots.forEach((s,i)=>{ s.textContent=correct[i] || ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='❌ Oops! Answer: '+q.a; wrongSound.play(); answersLog.push({q:q.q, a:q.a, correct:false, skipped:false}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
+
+    function handleSkip(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot')); slots.forEach((s,i)=>{ s.textContent=correct[i] || ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='⏭️ Skipped! Answer: '+q.a; wrongSound.play(); answersLog.push({q:q.q, a:q.a, correct:false, skipped:true}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
+
+    function updateProgress(){ progressFill.style.width = ((currentIndex/ROUND_SIZE)*100)+'%'; progressLabel.textContent = `${currentIndex}/${ROUND_SIZE} answered`; }
+
+    function endRound(){ gameArea.style.display='none'; report.style.display='block'; leaderboard.style.display='none'; const correctCount=answersLog.filter(x=>x.correct).length; const scorePercent=Math.round((correctCount/ROUND_SIZE)*100); reportTitle.textContent=`Report for ${playerName}`; scoreSummary.innerHTML=`<div style="font-size:20px">Score: ${correctCount}/${ROUND_SIZE} (${scorePercent}%)</div>`; let medal=''; if(scorePercent>=80) medal='🥇'; else if(scorePercent>=60) medal='🥈'; else if(scorePercent>=40) medal='🥉'; if(medal) scoreSummary.innerHTML += `<div class="medal">${medal}</div>`; let html='<table><thead><tr><th>Q</th><th>Riddle</th><th>Your Result</th></tr></thead><tbody>'; answersLog.forEach((x,i)=>{ const res=x.correct?'✅ Correct':(x.skipped?'⏭️ Skipped':'❌ Wrong'); html+=`<tr><td>${i+1}</td><td>${x.q}</td><td>${res} (Ans: ${x.a})</td></tr>`; }); html+='</tbody></table>'; reportBody.innerHTML=html; saveScore({name:playerName, score:scorePercent, medal}); }
+
+    showLB.addEventListener('click', ()=>{ leaderboard.style.display='block'; renderLB(); });
+    document.getElementById('closeLB').addEventListener('click', ()=>{ leaderboard.style.display='none'; });
+    function saveScore(entry){ let list=JSON.parse(localStorage.getItem('riddleScores')||'[]'); list.push(entry); list=list.slice(-20); localStorage.setItem('riddleScores', JSON.stringify(list)); }
+    function renderLB(){ let list=JSON.parse(localStorage.getItem('riddleScores')||'[]'); list=list.sort((a,b)=>b.score-a.score).slice(0,10); lbBody.innerHTML=''; list.forEach((x,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${i+1}</td><td>${x.name}</td><td>${x.score}%</td><td>${x.medal||''}</td>`; lbBody.appendChild(tr); }); }
+
+    function showConfetti(){ const count=20; for(let i=0;i<count;i++){ const conf=document.createElement('div'); conf.style.position='fixed'; conf.style.top='0'; conf.style.left=(Math.random()*100)+'%'; conf.style.width='10px'; conf.style.height='10px'; conf.style.background=`hsl(${Math.random()*360},100%,50%)`; conf.style.borderRadius='50%'; conf.style.opacity='0.8'; conf.style.zIndex=9999; conf.style.pointerEvents='none'; conf.animate([{transform:'translateY(0)'},{transform:'translateY(100vh)'}], {duration:Math.random()*1000+1500, easing:'ease-out'}); document.body.appendChild(conf); setTimeout(()=>conf.remove(),2000); } }
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+    function toggleMusic(){ if(musicOn){ bgMusic.pause(); musicBtn.textContent='🎵'; } else { bgMusic.play(); musicBtn.textContent='🔇'; } musicOn=!musicOn; }
+  </script>
 </body>
 </html>
+
+
