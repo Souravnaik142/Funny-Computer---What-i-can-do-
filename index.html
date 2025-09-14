@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Riddle Drag & Tap — Kids Game</title>
+  <title>Riddle Drag & Tap — Kids Game (Updated)</title>
   <style>
     :root{
       --bg1:#ff9a9e; --bg2:#fad0c4; --accent1:#43e97b; --accent2:#38f9d7; --card:#fff; --muted:#f0f0f0;
@@ -11,54 +11,49 @@
       --radius:18px;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{font-family: 'Comic Sans MS', cursive, sans-serif; background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh; margin:0; display:flex; align-items:center; justify-content:center; padding:28px;}
-    .app{width:100%; max-width:980px; background:transparent;}
-
+    .app{width:100%; max-width:980px;}
     .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
     .logo{font-size:1.4rem; color:#fff; font-weight:700; text-shadow:1px 1px 4px rgba(0,0,0,0.4)}
     .musicBtn{background:transparent; border:none; font-size:28px; cursor:pointer; color:#fff; padding:6px 10px}
-
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border-radius:20px; padding:20px; box-shadow:var(--shadow);}
-
-    #startScreen{display:flex; gap:18px; align-items:center; justify-content:center; flex-direction:column; padding:28px}
+    .card {background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border-radius: 20px; padding: 28px; box-shadow: var(--shadow); min-height: 480px;}
+    #startScreen{display:flex; gap:18px; align-items:center; justify-content:center; flex-direction:column; padding:18px}
     #playerName{font-size:18px; padding:12px 16px; border-radius:24px; border:none; width:260px}
-    .startBtn{background:linear-gradient(45deg,var(--accent1),var(--accent2)); color:#fff; padding:12px 20px; border-radius:24px; font-size:18px; border:none; cursor:pointer}
-
+    .startBtn{background:linear-gradient(45deg,var(--accent1),var(--accent2)); color:#fff; padding:12px 20px; border-radius:24px; font-size:16px; border:none; cursor:pointer}
     #categoryScreen{display:none; padding:12px}
     .categoryGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
     .catCard{background:var(--card); padding:12px; border-radius:14px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.08)}
     .catCard h3{margin:8px 0 4px}
     .catCard p{margin:0; font-size:13px; color:#666}
-
     #gameArea{display:none}
     .riddleBar{display:flex; align-items:center; justify-content:space-between}
-    #riddle{font-size:20px; padding:18px; border-radius:14px; background:linear-gradient(90deg,#fff3b0,#fff7e1); flex:1; margin-right:12px}
-    .meta{min-width:160px; text-align:right}
+    #riddle{font-size:22px; padding:18px; border-radius:20px; background:linear-gradient(90deg,#fff3b0,#fff7e1); flex:1; margin-right:12px; min-height:70px}
+    .meta{min-width:180px; text-align:right}
     .progress{height:14px; background:#eee; border-radius:99px; overflow:hidden; margin-top:8px}
     .progress > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,#ff6a00,#ee0979); transition:width .6s ease}
     #progressLabel{font-size:12px;color:#333;margin-top:4px}
-
+    #playerLabel{font-size:12px;color:#444;margin-top:8px}
     #answerSlots{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:18px 0}
-    .slot{min-width:46px; height:46px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; background:#f0f8ff; font-weight:700; font-size:18px; border-bottom:3px solid #000;}
+    .slot{min-width:46px; height:46px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; background:#f0f8ff; font-weight:700; font-size:18px; border-bottom:3px solid #000; user-select:none; cursor:pointer}
     .gap{width:20px}
-
     #letters{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
-    .tile{padding:12px 14px; border-radius:12px; cursor:pointer; user-select:none; font-weight:800; font-size:18px; box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    .tile{padding:12px 14px; border-radius:12px; cursor:pointer; user-select:none; font-weight:800; font-size:18px; box-shadow:0 6px 18px rgba(0,0,0,0.12); transition:transform .12s ease}
+    .tile:active{transform:scale(.98)}
     .tile[role=button]{outline:none}
-
     #controls{display:flex; gap:8px; justify-content:center; margin-top:12px}
     #controls button{padding:10px 14px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(45deg,var(--accent1),var(--accent2)); color:#fff}
-
     #feedback{font-size:20px; text-align:center; margin-top:10px; min-height:28px}
-
     #report{display:none; padding:14px}
     #report table{width:100%; border-collapse:collapse}
     #report th, #report td{padding:8px; border:1px solid #ddd}
     .medal{font-size:36px}
-
     #leaderboard{display:none; margin-top:12px}
     #lbTable{width:100%; border-collapse:collapse}
     #lbTable th,#lbTable td{padding:8px;border:1px solid #ddd;text-align:left}
+    .small{font-size:13px;color:#666}
+    .controls-row{display:flex; gap:8px; align-items:center; justify-content:center}
+    @media (max-width:520px){ .riddleBar{flex-direction:column; align-items:flex-start} .meta{text-align:left; min-width:unset; margin-top:8px} }
   </style>
 </head>
 <body>
@@ -73,15 +68,36 @@
       <div id="startScreen">
         <h1 style="margin:0;color:#333">Welcome!</h1>
         <div style="font-size:15px;color:#555">Enter your name to begin</div>
-        <input id="playerName" placeholder="Your name" />
-        <div style="display:flex; gap:12px; align-items:center">
-          <button id="startBtn" class="startBtn">Start</button>
+        <input id="playerName" placeholder="Your name" aria-label="Player name" />
+        <div style="display:flex; gap:12px; align-items:center; flex-direction:column">
+          <div class="controls-row">
+            <button id="startBtn" class="startBtn">Start</button>
+            <button id="howBtn" class="startBtn" style="background:linear-gradient(45deg,#6a11cb,#2575fc)">How to play</button>
+          </div>
+          <div class="small">Tip: tap letters on mobile or drag them into slots.</div>
         </div>
       </div>
 
       <!-- Category Selection -->
       <div id="categoryScreen">
-        <h2 style="margin-top:0">Choose a category</h2>
+        <h2 style="margin-top:0">Choose a category & difficulty</h2>
+        <div style="display:flex;gap:12px; margin-bottom:10px; align-items:center; flex-wrap:wrap">
+          <select id="catSelect" style="padding:10px;border-radius:12px;border:1px solid #ddd">
+            <option value="all">Mixed</option>
+            <option value="computer">Computer</option>
+            <option value="animals">Animals</option>
+            <option value="environment">Environment</option>
+          </select>
+
+          <select id="difficulty" style="padding:10px;border-radius:12px;border:1px solid #ddd">
+            <option value="easy">Easy (6)</option>
+            <option value="medium" selected>Medium (10)</option>
+            <option value="hard">Hard (14)</option>
+          </select>
+
+          <div class="small">Round length changes with difficulty.</div>
+        </div>
+
         <div class="categoryGrid" id="categoryGrid"></div>
         <div style="text-align:center;margin-top:12px"><button id="catBack" class="startBtn" style="background:linear-gradient(45deg,#f7971e,#ffd200)">Back</button></div>
       </div>
@@ -94,14 +110,14 @@
             <div id="qCount">Q 0 / 10</div>
             <div class="progress" style="width:160px"><i id="progressFill"></i></div>
             <div id="progressLabel"></div>
-            <div style="font-size:12px;color:#444;margin-top:8px" id="playerLabel"></div>
+            <div id="playerLabel"></div>
           </div>
         </div>
 
-        <div id="answerSlots"></div>
-        <div id="letters"></div>
+        <div id="answerSlots" aria-live="polite"></div>
+        <div id="letters" aria-hidden="false"></div>
         <div id="controls"></div>
-        <div id="feedback"></div>
+        <div id="feedback" role="status"></div>
       </div>
 
       <!-- Report -->
@@ -116,8 +132,11 @@
 
         <div id="leaderboard">
           <h3>Leaderboard</h3>
-          <table id="lbTable"><thead><tr><th>Rank</th><th>Name</th><th>Score %</th><th>Medal</th></tr></thead><tbody id="lbBody"></tbody></table>
-          <div style="text-align:center;margin-top:10px"><button id="closeLB" class="startBtn" style="background:linear-gradient(45deg,#f7971e,#ffd200)">Close</button></div>
+          <table id="lbTable"><thead><tr><th>Rank</th><th>Name</th><th>Score %</th><th>Medal</th><th>Date</th></tr></thead><tbody id="lbBody"></tbody></table>
+          <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center">
+            <button id="closeLB" class="startBtn" style="background:linear-gradient(45deg,#f7971e,#ffd200)">Close</button>
+            <button id="clearLB" class="startBtn" style="background:linear-gradient(45deg,#ff5f6d,#ffc371)">Clear</button>
+          </div>
         </div>
       </div>
     </div>
@@ -129,7 +148,7 @@
   <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
 
   <script>
-  const riddles={
+const riddles={
 computer:[
 {q:"I have keys but no doors",a:"KEYBOARD",emoji:"⌨️"},
 {q:"I have a brain but I am not human",a:"CPU",emoji:"🖥️"},
@@ -283,141 +302,191 @@ environment:[
 };
 
 
-    let playerName='Player', musicOn=false, currentCategory='all';
-    let roundQuestions=[], answersLog=[], currentIndex=0;
-    const ROUND_SIZE=10;
-    let usedQuestions=new Set(); // Track asked questions
-    let hintUsed=0; // per question
+  // Game state
+  let playerName='Player', musicOn=false, currentCategory='all';
+  let roundQuestions=[], answersLog=[], currentIndex=0;
+  let ROUND_SIZE=10; // will set from difficulty
+  let usedQuestions=new Set(); // Track asked questions
+  let hintUsed=0; // per question
 
-    const startScreen=document.getElementById('startScreen');
-    const categoryScreen=document.getElementById('categoryScreen');
-    const categoryGrid=document.getElementById('categoryGrid');
-    const gameArea=document.getElementById('gameArea');
-    const riddleEl=document.getElementById('riddle');
-    const answerSlots=document.getElementById('answerSlots');
-    const lettersEl=document.getElementById('letters');
-    const controlsEl=document.getElementById('controls');
-    const feedbackEl=document.getElementById('feedback');
-    const qCountEl=document.getElementById('qCount');
-    const progressFill=document.getElementById('progressFill');
-    const progressLabel=document.getElementById('progressLabel');
-    const playerLabel=document.getElementById('playerLabel');
-    const report=document.getElementById('report');
-    const reportBody=document.getElementById('reportBody');
-    const reportTitle=document.getElementById('reportTitle');
-    const scoreSummary=document.getElementById('scoreSummary');
-    const playAgainBtn=document.getElementById('playAgainBtn');
-    const showLB=document.getElementById('showLB');
-    const leaderboard=document.getElementById('leaderboard');
-    const lbBody=document.getElementById('lbBody');
-    const bgMusic=document.getElementById('bgMusic');
-    const musicBtn=document.getElementById('musicBtn');
-    const correctSound=document.getElementById('correctSound');
-    const wrongSound=document.getElementById('wrongSound');
+  // DOM refs
+  const startScreen=document.getElementById('startScreen');
+  const categoryScreen=document.getElementById('categoryScreen');
+  const categoryGrid=document.getElementById('categoryGrid');
+  const gameArea=document.getElementById('gameArea');
+  const riddleEl=document.getElementById('riddle');
+  const answerSlots=document.getElementById('answerSlots');
+  const lettersEl=document.getElementById('letters');
+  const controlsEl=document.getElementById('controls');
+  const feedbackEl=document.getElementById('feedback');
+  const qCountEl=document.getElementById('qCount');
+  const progressFill=document.getElementById('progressFill');
+  const progressLabel=document.getElementById('progressLabel');
+  const playerLabel=document.getElementById('playerLabel');
+  const report=document.getElementById('report');
+  const reportBody=document.getElementById('reportBody');
+  const reportTitle=document.getElementById('reportTitle');
+  const scoreSummary=document.getElementById('scoreSummary');
+  const playAgainBtn=document.getElementById('playAgainBtn');
+  const showLB=document.getElementById('showLB');
+  const leaderboard=document.getElementById('leaderboard');
+  const lbBody=document.getElementById('lbBody');
+  const bgMusic=document.getElementById('bgMusic');
+  const musicBtn=document.getElementById('musicBtn');
+  const correctSound=document.getElementById('correctSound');
+  const wrongSound=document.getElementById('wrongSound');
+  const catSelect=document.getElementById('catSelect');
+  const difficultySelect=document.getElementById('difficulty');
 
-    document.getElementById('startBtn').addEventListener('click', ()=>{
-      playerName = (document.getElementById('playerName').value || 'Player').trim() || 'Player';
-      showCategories();
-    });
-    document.getElementById('catBack').addEventListener('click', ()=>{ showStart(); });
-    musicBtn.addEventListener('click', toggleMusic);
-    playAgainBtn.addEventListener('click', ()=>{ showCategories(); });
-    showStart();
+  document.getElementById('startBtn').addEventListener('click', ()=>{ playerName = (document.getElementById('playerName').value || 'Player').trim() || 'Player'; showCategories(); });
+  document.getElementById('howBtn').addEventListener('click', showHow);
+  document.getElementById('catBack').addEventListener('click', ()=>{ showStart(); });
+  musicBtn.addEventListener('click', toggleMusic);
+  playAgainBtn.addEventListener('click', ()=>{ showCategories(); });
+  showStart();
 
-    function showCategories(){
-      startScreen.style.display='none'; report.style.display='none';
-      categoryScreen.style.display='block'; gameArea.style.display='none';
-      categoryGrid.innerHTML='';
-      const cats = ['all','computer','animals','environment'];
-      cats.forEach(c=>{
-        const card=document.createElement('div'); card.className='catCard';
-        card.innerHTML=`<h3>${capitalize(c)}</h3><p>${c==='all' ? 'Mixed topics' : 'Riddles about '+c}</p>`;
-        card.onclick=()=>{ currentCategory=c; startRound(); };
-        categoryGrid.appendChild(card);
-      });
-    }
-    function showStart(){ categoryScreen.style.display='none'; startScreen.style.display='flex'; }
-    function capitalize(s){ return (s||'').charAt(0).toUpperCase()+s.slice(1); }
+  function showHow(){ alert('Drag or tap letters into the slots. Use Hint to reveal up to 2 letters per question. Press Backspace to remove last letter.'); }
+  function showCategories(){ startScreen.style.display='none'; report.style.display='none'; categoryScreen.style.display='block'; gameArea.style.display='none'; categoryGrid.innerHTML='';
+    // show categories as cards for quick pick
+    const cats = ['all','computer','animals','environment'];
+    cats.forEach(c=>{ const card=document.createElement('div'); card.className='catCard'; card.innerHTML=`<h3>${capitalize(c)}</h3><p>${c==='all' ? 'Mixed topics' : 'Riddles about '+c}</p>`; card.onclick=()=>{ currentCategory=c; startRoundFromUI(); }; categoryGrid.appendChild(card); });
+  }
+  function showStart(){ categoryScreen.style.display='none'; startScreen.style.display='flex'; }
+  function capitalize(s){ return (s||'').charAt(0).toUpperCase()+s.slice(1); }
 
-    function startRound(){
-      const pool = currentCategory==='all' ? [...riddles.computer,...riddles.animals,...riddles.environment] : riddles[currentCategory] || [];
-      let freshPool = pool.filter(q=>!usedQuestions.has(q.q));
-      if(freshPool.length<ROUND_SIZE){ usedQuestions.clear(); freshPool=pool; }
-      const shuffled = shuffle(freshPool.slice());
-      roundQuestions = shuffled.slice(0, ROUND_SIZE);
-      roundQuestions.forEach(q=>usedQuestions.add(q.q));
+  // Utility: dedupe pool by answer (normalized)
+  function uniqueByAnswer(pool){ const map = new Map(); pool.forEach(item=>{ const key = (item.a || '').replace(/\s+/g,'').toUpperCase(); if(!map.has(key)) map.set(key, item); }); return Array.from(map.values()); }
 
-      answersLog = []; currentIndex=0;
-      report.style.display='none'; categoryScreen.style.display='none'; gameArea.style.display='block';
-      playerLabel.textContent = playerName;
-      updateProgress(); renderQuestion();
-    }
+  function startRoundFromUI(){
+    // set difficulty-based round size
+    const diff = (difficultySelect.value || 'medium');
+    if(diff==='easy') ROUND_SIZE = 6;
+    else if(diff==='hard') ROUND_SIZE = 14;
+    else ROUND_SIZE = 10;
+    startRound();
+  }
 
-    function renderQuestion(){
-      clearTimeout(window._nextTimeout); feedbackEl.textContent=''; controlsEl.innerHTML='';
-      answerSlots.innerHTML=''; lettersEl.innerHTML=''; hintUsed=0;
-      const q = roundQuestions[currentIndex];
-      qCountEl.textContent = `Q ${currentIndex+1} / ${ROUND_SIZE}`; riddleEl.textContent = q.emoji + ' ' + q.q;
-      const answer = q.a; const lettersArr = answer.replace(/\s+/g,'').split('');
-      for(let i=0;i<answer.length;i++){
-        if(answer[i]===' '){ const g=document.createElement('div'); g.className='gap'; answerSlots.appendChild(g); }
-        else{ const s=document.createElement('div'); s.className='slot'; s.dataset.pos=i; s.ondrop=drop; s.ondragover=allowDrop; answerSlots.appendChild(s); }
+  function startRound(){
+    let pool = currentCategory==='all' ? [...riddles.computer,...riddles.animals,...riddles.environment] : (riddles[currentCategory] || []);
+    pool = uniqueByAnswer(pool);
+    let freshPool = pool.filter(q=>!usedQuestions.has((q.a||'').replace(/\s+/g,'')+ '||' + q.q));
+    if(freshPool.length < ROUND_SIZE){ usedQuestions.clear(); freshPool = pool.slice(); }
+    const shuffled = shuffle(freshPool.slice());
+    roundQuestions = shuffled.slice(0, ROUND_SIZE);
+    roundQuestions.forEach(q=>usedQuestions.add((q.a||'').replace(/\s+/g,'')+ '||' + q.q));
+
+    answersLog = []; currentIndex=0; report.style.display='none'; categoryScreen.style.display='none'; gameArea.style.display='block'; playerLabel.textContent = playerName; updateProgress(); renderQuestion();
+  }
+
+  function renderQuestion(){ clearTimeout(window._nextTimeout); feedbackEl.textContent=''; controlsEl.innerHTML=''; answerSlots.innerHTML=''; lettersEl.innerHTML=''; hintUsed=0;
+    const q = roundQuestions[currentIndex]; qCountEl.textContent = `Q ${currentIndex+1} / ${ROUND_SIZE}`; riddleEl.textContent = q.emoji + ' ' + q.q;
+    const answer = q.a; const clean = answer.replace(/\s+/g,'');
+    // Build slots
+    for(let i=0;i<clean.length;i++){ const s=document.createElement('div'); s.className='slot'; s.dataset.pos = i; s.dataset.tileId = ''; s.ondrop = drop; s.ondragover = allowDrop; s.onclick = slotClick; s.setAttribute('aria-label','letter slot'); answerSlots.appendChild(s); }
+
+    // Build tiles — keep duplicates by creating a tile per letter instance
+    const lettersArr = clean.split('');
+    const shuffledLetters = shuffle(lettersArr.slice());
+    shuffledLetters.forEach((L, idx)=>{ const t=document.createElement('div'); t.className='tile'; t.textContent=L; t.id='tile_'+idx+'_'+Date.now()+Math.floor(Math.random()*1000); t.draggable=true; t.setAttribute('role','button'); t.ondragstart=dragStart; t.onclick = ()=>tileClick(t); t.style.background = `hsl(${Math.random()*360},70%,85%)`; lettersEl.appendChild(t); });
+
+    const resetBtn=document.createElement('button'); resetBtn.textContent='Reset'; resetBtn.onclick=clearAnswer; controlsEl.appendChild(resetBtn);
+    const skipBtn=document.createElement('button'); skipBtn.textContent='Skip'; skipBtn.onclick=()=>handleSkip(); controlsEl.appendChild(skipBtn);
+    const hintBtn=document.createElement('button'); hintBtn.textContent='Hint (2)'; hintBtn.onclick=()=>useHint(hintBtn); controlsEl.appendChild(hintBtn);
+
+    updateProgress();
+  }
+
+  function useHint(btn){ if(hintUsed>=2) return; const q=roundQuestions[currentIndex]; const clean = q.a.replace(/\s+/g,''); const slots = Array.from(document.querySelectorAll('.slot'));
+    const emptySlots = slots.filter((s)=>!s.textContent);
+    if(emptySlots.length===0) return;
+    let targetIdx = -1;
+    if(hintUsed===0){ for(let i=0;i<clean.length;i++){ const s = slots.find(ss=>Number(ss.dataset.pos)===i); if(s && !s.textContent){ targetIdx = i; break; } } } else { for(let i=clean.length-1;i>=0;i--){ const s = slots.find(ss=>Number(ss.dataset.pos)===i); if(s && !s.textContent){ targetIdx = i; break; } } }
+    if(targetIdx===-1){ const randSlot = emptySlots[Math.floor(Math.random()*emptySlots.length)]; targetIdx = Number(randSlot.dataset.pos); }
+    const slot = slots.find(s=>Number(s.dataset.pos)===targetIdx); if(!slot) return; const letter = clean[targetIdx];
+    const tile = Array.from(document.querySelectorAll('.tile')).find(t=>t.textContent===letter && t.style.visibility!=='hidden');
+    slot.textContent = letter; slot.dataset.tileId = tile ? tile.id : ''; if(tile) tile.style.visibility='hidden'; hintUsed++; btn.textContent=`Hint (${2-hintUsed})`; if(hintUsed>=2) btn.disabled=true; checkAutoAnswer(); }
+
+  function dragStart(ev){ ev.dataTransfer.setData('text/plain', ev.target.id); }
+  function allowDrop(ev){ ev.preventDefault(); }
+  function drop(ev){ ev.preventDefault(); const id = ev.dataTransfer.getData('text'); const tile = document.getElementById(id); if(!tile) return; const target = ev.target; if(target.classList.contains('slot')){ if(target.textContent===''){ target.textContent = tile.textContent; target.dataset.tileId = tile.id; tile.style.visibility='hidden'; checkAutoAnswer(); } else { const oldId = target.dataset.tileId; if(oldId){ const oldTile = document.getElementById(oldId); if(oldTile) oldTile.style.visibility='visible'; } target.textContent = tile.textContent; target.dataset.tileId = tile.id; tile.style.visibility='hidden'; checkAutoAnswer(); } } }
+
+  // when a tile is clicked/tapped, place it in first empty slot
+  function tileClick(tile){ if(tile.style.visibility==='hidden') return; const empty = Array.from(document.querySelectorAll('.slot')).find(s=>s.textContent===''); if(empty){ empty.textContent = tile.textContent; empty.dataset.tileId = tile.id; tile.style.visibility='hidden'; checkAutoAnswer(); } }
+
+  // when slot is clicked, clear it and restore the tile (if any)
+  function slotClick(ev){ const slot = ev.currentTarget || ev.target; const tid = slot.dataset.tileId; if(!slot.textContent) return; slot.textContent = ''; slot.dataset.tileId = ''; if(tid){ const tile = document.getElementById(tid); if(tile) tile.style.visibility = 'visible'; } }
+
+  function clearAnswer(){ document.querySelectorAll('.slot').forEach(s=>{ s.textContent=''; s.dataset.tileId=''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='visible'); feedbackEl.textContent=''; }
+
+  function getUserAnswer(){ const slots = Array.from(document.querySelectorAll('.slot')).sort((a,b)=> Number(a.dataset.pos) - Number(b.dataset.pos)); return slots.map(s=>s.textContent || '').join(''); }
+
+  function checkAutoAnswer(){ const q=roundQuestions[currentIndex]; const clean=q.a.replace(/\s+/g,''); const user=getUserAnswer(); if(user.length===clean.length){ if(user.toUpperCase()===clean.toUpperCase()){ handleCorrect(); } else { showCorrectNow(); } } }
+
+  function handleCorrect(){ answersLog.push({q:roundQuestions[currentIndex].q, a:roundQuestions[currentIndex].a, correct:true, skipped:false}); feedbackEl.textContent='✅ Correct!'; try{ correctSound.play(); }catch(e){} showConfetti(); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 900); }
+
+  function showCorrectNow(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot'));
+    slots.forEach(s=>{ const idx = Number(s.dataset.pos); s.textContent = correct[idx] || ''; s.dataset.tileId = ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='❌ Oops! Answer: '+q.a; try{ wrongSound.play(); }catch(e){} answersLog.push({q:q.q, a:q.a, correct:false, skipped:false}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
+
+  function handleSkip(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot'));
+    slots.forEach(s=>{ const idx = Number(s.dataset.pos); s.textContent = correct[idx] || ''; s.dataset.tileId = ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='⏭️ Skipped! Answer: '+q.a; try{ wrongSound.play(); }catch(e){} answersLog.push({q:q.q, a:q.a, correct:false, skipped:true}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
+
+  function updateProgress(){ const answered = answersLog.length; progressFill.style.width = ((answered/ROUND_SIZE)*100)+'%'; progressLabel.textContent = `${answered}/${ROUND_SIZE} answered`; qCountEl.textContent = `Q ${Math.min(currentIndex+1, ROUND_SIZE)} / ${ROUND_SIZE}`; }
+
+  function endRound(){ gameArea.style.display='none'; report.style.display='block'; leaderboard.style.display='none';
+    const correctCount = answersLog.filter(x=>x.correct).length; const scorePercent = Math.round((correctCount/ROUND_SIZE)*100);
+    reportTitle.textContent = `Report for ${playerName}`;
+    // Medal logic
+    let medal = '';
+    if(scorePercent >= 90) medal = '🥇';
+    else if(scorePercent >= 75) medal = '🥈';
+    else if(scorePercent >= 50) medal = '🥉';
+
+    // Star logic (simple)
+    let stars = '⭐'.repeat(Math.min(5, Math.ceil(scorePercent/20)));
+
+    scoreSummary.innerHTML = `\n      <div style="font-size:20px">Score: ${correctCount}/${ROUND_SIZE} (${scorePercent}%)</div>\n      ${medal ? `<div class="medal">${medal}</div>` : ''}\n      <div style="font-size:24px;color:#f4d03f">${stars}</div>\n    `;
+
+    // Detailed table
+    let html = '<table><thead><tr><th>Q</th><th>Riddle</th><th>Your Result</th></tr></thead><tbody>';
+    answersLog.forEach((x,i)=>{ const res = x.correct ? '✅ Correct' : (x.skipped ? '⏭️ Skipped' : '❌ Wrong'); html += `<tr><td>${i+1}</td><td>${x.q}</td><td>${res} (Ans: ${x.a})</td></tr>`; });
+    html += '</tbody></table>';
+    reportBody.innerHTML = html;
+
+    saveScore({name: playerName, score: scorePercent, medal});
+  }
+
+  showLB.addEventListener('click', ()=>{ leaderboard.style.display='block'; renderLB(); });
+  document.getElementById('closeLB').addEventListener('click', ()=>{ leaderboard.style.display='none'; });
+  document.getElementById('clearLB').addEventListener('click', ()=>{ if(confirm('Clear leaderboard?')){ localStorage.removeItem('riddleScores'); renderLB(); } });
+
+  function saveScore(entry){ let list=JSON.parse(localStorage.getItem('riddleScores')||'[]'); entry.date = new Date().toLocaleString(); list.push(entry); // keep latest 200
+    list = list.slice(-200); localStorage.setItem('riddleScores', JSON.stringify(list)); }
+
+  function renderLB(){ let list = JSON.parse(localStorage.getItem('riddleScores') || '[]'); // sort by score desc then date desc
+    list = list.sort((a,b)=> { if(b.score!==a.score) return b.score - a.score; return new Date(b.date) - new Date(a.date); }).slice(0,10);
+    lbBody.innerHTML = ''; list.forEach((x,i)=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(x.name)}</td><td>${x.score}%</td><td>${x.medal||''}</td><td>${x.date||''}</td>`; lbBody.appendChild(tr); }); }
+
+  // simple html-escape to avoid injection if name contains "<"
+  function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function showConfetti(){ const count=16; for(let i=0;i<count;i++){ const conf=document.createElement('div'); conf.style.position='fixed'; conf.style.top='-10px'; conf.style.left=(Math.random()*100)+'%'; conf.style.width='10px'; conf.style.height='10px'; conf.style.background=`hsl(${Math.random()*360},100%,50%)`; conf.style.borderRadius='50%'; conf.style.opacity='0.9'; conf.style.zIndex=9999; conf.style.pointerEvents='none'; conf.animate([{transform:'translateY(0)','opacity':1},{transform:'translateY(100vh)','opacity':0}], {duration:Math.random()*1200+800, easing:'ease-out'}); document.body.appendChild(conf); setTimeout(()=>conf.remove(),1800); } }
+
+  function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+  function toggleMusic(){ if(musicOn){ bgMusic.pause(); musicBtn.textContent='🎵'; } else { bgMusic.play().catch(()=>{}); musicBtn.textContent='🔇'; } musicOn=!musicOn; }
+
+  // Keyboard support: letters place matching visible tile, Backspace removes last filled slot
+  document.addEventListener('keydown',(e)=>{
+    if(gameArea.style.display==='block'){
+      const key = e.key;
+      if(key==='Backspace'){ e.preventDefault(); // clear last filled slot
+        const filled = Array.from(document.querySelectorAll('.slot')).filter(s=>s.textContent); if(filled.length){ const last = filled[filled.length-1]; const tid = last.dataset.tileId; last.textContent=''; last.dataset.tileId=''; if(tid){ const tile = document.getElementById(tid); if(tile) tile.style.visibility='visible'; } }
+      } else if(/^[a-zA-Z]$/.test(key)){
+        const letter = key.toUpperCase(); const tile = Array.from(document.querySelectorAll('.tile')).find(t=>t.textContent===letter && t.style.visibility!=='hidden'); if(tile){ tileClick(tile); }
       }
-      shuffle(lettersArr.slice()).forEach((L, idx)=>{
-        const t=document.createElement('div'); t.className='tile'; t.textContent=L; t.id='tile_'+idx; 
-        t.draggable=true; t.setAttribute('role','button');
-        t.ondragstart=dragStart; t.onclick = ()=>tileClick(t);
-        t.style.background = `hsl(${Math.random()*360},70%,85%)`;
-        lettersEl.appendChild(t);
-      });
-      const resetBtn=document.createElement('button'); resetBtn.textContent='Reset'; resetBtn.onclick=clearAnswer; controlsEl.appendChild(resetBtn);
-      const skipBtn=document.createElement('button'); skipBtn.textContent='Skip'; skipBtn.onclick=()=>handleSkip(); controlsEl.appendChild(skipBtn);
-      const hintBtn=document.createElement('button'); hintBtn.textContent='Hint (2)'; hintBtn.onclick=()=>useHint(hintBtn); controlsEl.appendChild(hintBtn);
-      updateProgress();
     }
+  });
 
-    function useHint(btn){
-      if(hintUsed>=2) return;
-      const q=roundQuestions[currentIndex]; const answer=q.a.replace(/\s+/g,'');
-      const slots=Array.from(document.querySelectorAll('.slot'));
-      const emptySlots=slots.filter((s,i)=>s.textContent==='' && answer[i]);
-      if(emptySlots.length===0) return;
-      const slot=emptySlots[Math.floor(Math.random()*emptySlots.length)];
-      const idx=Array.from(slots).indexOf(slot); slot.textContent=answer[idx];
-      const tile=Array.from(document.querySelectorAll('.tile')).find(t=>t.textContent===answer[idx] && t.style.visibility!=='hidden');
-      if(tile) tile.style.visibility='hidden';
-      hintUsed++; btn.textContent=`Hint (${2-hintUsed})`; if(hintUsed>=2) btn.disabled=true;
-      checkAutoAnswer();
-    }
-
-    function dragStart(ev){ ev.dataTransfer.setData('text/plain', ev.target.id); }
-    function allowDrop(ev){ ev.preventDefault(); }
-    function drop(ev){ ev.preventDefault(); const id = ev.dataTransfer.getData('text'); const tile = document.getElementById(id); if(!tile) return; if(ev.target.classList.contains('slot') && ev.target.textContent===''){ ev.target.textContent = tile.textContent; tile.style.visibility='hidden'; checkAutoAnswer(); } }
-    function tileClick(tile){ const empty = Array.from(document.querySelectorAll('.slot')).find(s=>s.textContent===''); if(empty){ empty.textContent = tile.textContent; tile.style.visibility='hidden'; checkAutoAnswer(); } }
-
-    function clearAnswer(){ document.querySelectorAll('.slot').forEach(s=>s.textContent=''); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='visible'); feedbackEl.textContent=''; }
-
-    function getUserAnswer(){ return Array.from(document.querySelectorAll('.slot')).map(s=>s.textContent || '').join(''); }
-    function checkAutoAnswer(){ const q=roundQuestions[currentIndex]; const clean=q.a.replace(/\s+/g,''); const user=getUserAnswer(); if(user.length===clean.length){ if(user.toUpperCase()===clean.toUpperCase()){ handleCorrect(); } else { showCorrectNow(); } } }
-
-    function handleCorrect(){ answersLog.push({q:roundQuestions[currentIndex].q, a:roundQuestions[currentIndex].a, correct:true, skipped:false}); feedbackEl.textContent='✅ Correct!'; correctSound.play(); showConfetti(); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 900); }
-
-    function showCorrectNow(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot')); slots.forEach((s,i)=>{ s.textContent=correct[i] || ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='❌ Oops! Answer: '+q.a; wrongSound.play(); answersLog.push({q:q.q, a:q.a, correct:false, skipped:false}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
-
-    function handleSkip(){ const q=roundQuestions[currentIndex]; const correct=q.a.replace(/\s+/g,''); const slots=Array.from(document.querySelectorAll('.slot')); slots.forEach((s,i)=>{ s.textContent=correct[i] || ''; }); document.querySelectorAll('.tile').forEach(t=>t.style.visibility='hidden'); feedbackEl.textContent='⏭️ Skipped! Answer: '+q.a; wrongSound.play(); answersLog.push({q:q.q, a:q.a, correct:false, skipped:true}); updateProgress(); window._nextTimeout=setTimeout(()=>{ currentIndex++; if(currentIndex>=ROUND_SIZE) endRound(); else renderQuestion(); }, 1500); }
-
-    function updateProgress(){ progressFill.style.width = ((currentIndex/ROUND_SIZE)*100)+'%'; progressLabel.textContent = `${currentIndex}/${ROUND_SIZE} answered`; }
-
-    function endRound(){ gameArea.style.display='none'; report.style.display='block'; leaderboard.style.display='none'; const correctCount=answersLog.filter(x=>x.correct).length; const scorePercent=Math.round((correctCount/ROUND_SIZE)*100); reportTitle.textContent=`Report for ${playerName}`; scoreSummary.innerHTML=`<div style="font-size:20px">Score: ${correctCount}/${ROUND_SIZE} (${scorePercent}%)</div>`; let medal=''; if(scorePercent>=80) medal='🥇'; else if(scorePercent>=60) medal='🥈'; else if(scorePercent>=40) medal='🥉'; if(medal) scoreSummary.innerHTML += `<div class="medal">${medal}</div>`; let html='<table><thead><tr><th>Q</th><th>Riddle</th><th>Your Result</th></tr></thead><tbody>'; answersLog.forEach((x,i)=>{ const res=x.correct?'✅ Correct':(x.skipped?'⏭️ Skipped':'❌ Wrong'); html+=`<tr><td>${i+1}</td><td>${x.q}</td><td>${res} (Ans: ${x.a})</td></tr>`; }); html+='</tbody></table>'; reportBody.innerHTML=html; saveScore({name:playerName, score:scorePercent, medal}); }
-
-    showLB.addEventListener('click', ()=>{ leaderboard.style.display='block'; renderLB(); });
-    document.getElementById('closeLB').addEventListener('click', ()=>{ leaderboard.style.display='none'; });
-    function saveScore(entry){ let list=JSON.parse(localStorage.getItem('riddleScores')||'[]'); list.push(entry); list=list.slice(-20); localStorage.setItem('riddleScores', JSON.stringify(list)); }
-    function renderLB(){ let list=JSON.parse(localStorage.getItem('riddleScores')||'[]'); list=list.sort((a,b)=>b.score-a.score).slice(0,10); lbBody.innerHTML=''; list.forEach((x,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${i+1}</td><td>${x.name}</td><td>${x.score}%</td><td>${x.medal||''}</td>`; lbBody.appendChild(tr); }); }
-
-    function showConfetti(){ const count=20; for(let i=0;i<count;i++){ const conf=document.createElement('div'); conf.style.position='fixed'; conf.style.top='0'; conf.style.left=(Math.random()*100)+'%'; conf.style.width='10px'; conf.style.height='10px'; conf.style.background=`hsl(${Math.random()*360},100%,50%)`; conf.style.borderRadius='50%'; conf.style.opacity='0.8'; conf.style.zIndex=9999; conf.style.pointerEvents='none'; conf.animate([{transform:'translateY(0)'},{transform:'translateY(100vh)'}], {duration:Math.random()*1000+1500, easing:'ease-out'}); document.body.appendChild(conf); setTimeout(()=>conf.remove(),2000); } }
-    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
-    function toggleMusic(){ if(musicOn){ bgMusic.pause(); musicBtn.textContent='🎵'; } else { bgMusic.play(); musicBtn.textContent='🔇'; } musicOn=!musicOn; }
   </script>
 </body>
 </html>
